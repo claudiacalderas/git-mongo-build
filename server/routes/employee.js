@@ -18,11 +18,13 @@ var Employees = mongoose.model("Employees", EmployeeSchema);
 //GET employees
 router.get("/", function(req,res){
   //Get all employees
+  console.log("employees get route");
   Employees.find(function(err, allEmployees){
     if(err){
       console.log(err);
       res.sendStatus(500);
     }
+    console.log(allEmployees);
     res.send(allEmployees);
   });
 });
@@ -39,8 +41,34 @@ router.post("/", function(req,res){
       console.log(err);
       res.sendStatus(500);
     }
-
     res.send(savedEmployee);
+  });
+});
+
+//Update an employee
+router.put("/", function(req,res){
+  //Instance of the Model to be saved to the database
+  var id = req.body.id;
+  console.log("receiving: ", req.body);
+  Employees.findById(id, function (err, editEmployee) {
+    // Handle any possible database errors
+    if (err) {
+        res.status(500).send(err);
+    } else {
+        console.log("editEmployee is: ",editEmployee);
+        editEmployee.name = req.body.name;
+        editEmployee.position = req.body.position;
+        editEmployee.salary = req.body.salary;
+
+        // Save the updated document back to the database
+        editEmployee.save(function (err, todo) {
+            if (err) {
+              console.log(err);
+              res.sendStatus(500);
+            }
+            res.send(editEmployee);
+        });
+    }
   });
 });
 
